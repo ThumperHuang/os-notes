@@ -1,0 +1,48 @@
+:root { --main:#2563eb; --bg:#f8fafc; --text:#1e293b; --warn:#fef3c7; }
+* { box-sizing: border-box; }
+body { margin:0; font-family:"Noto Sans TC",system-ui,sans-serif;
+       background:var(--bg); color:var(--text); line-height:1.8; }
+.hero { background:var(--main); color:#fff; text-align:center; padding:48px 16px; }
+.hero h1 { margin:0 0 8px; }
+.container, .lesson { max-width:800px; margin:0 auto; padding:24px 16px; }
+.meta { color:#64748b; font-size:.9rem; }
+.section-title { border-left:4px solid var(--main); padding-left:10px; margin-top:32px; }
+
+/* 首頁：學習路徑 */
+.path { list-style:none; padding:0; margin:12px 0; }
+.path li { background:#fff; border-left:4px solid var(--main); border-radius:8px;
+           padding:8px 14px; margin-bottom:8px; display:flex;
+           justify-content:space-between; flex-wrap:wrap; gap:4px;
+           box-shadow:0 1px 3px rgba(0,0,0,.06); }
+.path li span { color:#64748b; font-size:.9rem; }
+.path li.planned { opacity:.55; border-left-color:#94a3b8; }
+
+/* 首頁：卡片 */
+.cards { display:grid; gap:16px; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); }
+.card { display:block; background:#fff; border-radius:12px; padding:16px;
+        text-decoration:none; color:inherit; border-top:4px solid var(--main);
+        box-shadow:0 1px 4px rgba(0,0,0,.08); transition:transform .15s; }
+a.card:hover { transform:translateY(-3px); }
+.card h2 { margin:8px 0 4px; font-size:1.1rem; }
+.card.planned { opacity:.55; border-top-color:#94a3b8; cursor:not-allowed; }
+.tag { font-size:.75rem; color:var(--main); font-weight:700; }
+
+/* 講義頁 */
+.lesson h2 { border-left:4px solid var(--main); padding-left:10px; margin-top:32px; }
+.lesson nav { display:flex; justify-content:space-between; align-items:center;
+              gap:8px; flex-wrap:wrap; margin-top:40px; }
+.lesson nav a { color:var(--main); text-decoration:none; }
+table { width:100%; border-collapse:collapse; background:#fff; margin:12px 0; }
+th, td { border:1px solid #e2e8f0; padding:8px 10px; text-align:left; font-size:.95rem; }
+th { background:#eff6ff; }
+pre { background:#0f172a; color:#e2e8f0; padding:16px; border-radius:8px; overflow-x:auto; }
+code { font-family:ui-monospace,Consolas,monospace; }
+p code, li code, td code { background:#e2e8f0; padding:1px 5px; border-radius:4px; }
+.formula { background:#eff6ff; border:1px dashed var(--main); border-radius:8px;
+           padding:12px; text-align:center; font-family:ui-monospace,Consolas,monospace; }
+.callout { background:var(--warn); border-left:4px solid #f59e0b;
+           border-radius:8px; padding:8px 16px; margin:16px 0; }
+details { background:#fff; padding:8px 12px; border-radius:8px; margin:8px 0;
+          border:1px solid #e2e8f0; }
+.rel a { color:var(--main); }
+footer { text-align:center; padding:24px; color:#64748b; font-size:.85rem; }
