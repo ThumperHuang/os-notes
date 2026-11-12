@@ -1,0 +1,80 @@
+[
+  {
+    "id": "os-01-introduction",
+    "title": "Ch1 作業系統導論",
+    "chapter": 1,
+    "category": "os",
+    "summary": "OS 定義、系統演進、CPU 利用率公式",
+    "difficulty": 1,
+    "status": "published",
+    "file": "lessons/os-01-introduction.html",
+    "prerequisites": [],
+    "related": ["os-02-os-structure"],
+    "concepts": ["operating-system", "system-call", "multiprogramming", "cpu-utilization"]
+  },
+  {
+    "id": "os-02-os-structure",
+    "title": "Ch2 作業系統結構",
+    "chapter": 2,
+    "category": "os",
+    "summary": "使用者介面、System Call、API",
+    "difficulty": 2,
+    "status": "planned",
+    "file": "lessons/os-02-os-structure.html",
+    "prerequisites": ["os-01-introduction"],
+    "related": ["os-03-processes"],
+    "concepts": ["system-call", "api"]
+  },
+  {
+    "id": "os-03-processes",
+    "title": "Ch3 行程 Processes",
+    "chapter": 3,
+    "category": "os",
+    "summary": "行程狀態、PCB、排程佇列、fork",
+    "difficulty": 2,
+    "status": "published",
+    "file": "lessons/os-03-processes.html",
+    "prerequisites": ["os-01-introduction"],
+    "related": ["os-04-threads", "os-05-cpu-scheduling"],
+    "concepts": ["process", "process-state-ready", "pcb", "long-term-scheduler", "short-term-scheduler"]
+  },
+  {
+    "id": "os-04-threads",
+    "title": "Ch4 執行緒與並行",
+    "chapter": 4,
+    "category": "os",
+    "summary": "Thread、並行與平行、多執行緒模型",
+    "difficulty": 2,
+    "status": "planned",
+    "file": "lessons/os-04-threads.html",
+    "prerequisites": ["os-03-processes"],
+    "related": ["os-05-cpu-scheduling"],
+    "concepts": ["thread", "concurrency", "parallelism"]
+  },
+  {
+    "id": "os-05-cpu-scheduling",
+    "title": "Ch5 CPU 排程",
+    "chapter": 5,
+    "category": "os",
+    "summary": "FCFS、SJF、RR 與等待時間計算",
+    "difficulty": 3,
+    "status": "published",
+    "file": "lessons/os-05-cpu-scheduling.html",
+    "prerequisites": ["os-03-processes", "os-04-threads"],
+    "related": ["os-06-synchronization"],
+    "concepts": ["preemptive-scheduling", "dispatcher", "waiting-time"]
+  },
+  {
+    "id": "os-06-synchronization",
+    "title": "Ch6 行程同步",
+    "chapter": 6,
+    "category": "os",
+    "summary": "Race condition、臨界區間與同步工具",
+    "difficulty": 3,
+    "status": "planned",
+    "file": "lessons/os-06-synchronization.html",
+    "prerequisites": ["os-05-cpu-scheduling"],
+    "related": [],
+    "concepts": ["race-condition"]
+  }
+]
