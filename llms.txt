@@ -1,0 +1,23 @@
+# OS 小講義
+
+> 作業系統課程筆記（政大資訊科學系，孫士勝老師），依章節循序學習。規則請先讀 AGENTS.md。
+
+## 重要檔案
+- [AGENTS.md](AGENTS.md)：專案規則與新增講義流程
+- [data/lessons.json](data/lessons.json)：章節目錄、先備與相關章節
+- [data/concepts.json](data/concepts.json)：概念知識圖譜
+- [sources/](sources/)：原始教材（唯讀）
+
+## 學習路徑
+1. [Ch1 作業系統導論](lessons/os-01-introduction.html)：無先備知識
+2. Ch2 作業系統結構（即將推出）：需先讀 Ch1
+3. [Ch3 行程](lessons/os-03-processes.html)：需先讀 Ch1
+4. Ch4 執行緒與並行（即將推出）：需先讀 Ch3
+5. [Ch5 CPU 排程](lessons/os-05-cpu-scheduling.html)：需先讀 Ch3、Ch4
+6. Ch6 同步（即將推出）：需先讀 Ch5
+
+## 跨章關聯
+- Ch3 的 Ready queue 是 Ch5 的排程對象。
+- Ch3 的 Long-term／Short-term scheduler 是 Ch5 的 CPU scheduler 之基礎。
+- Ch5 的 preemptive scheduling 會造成 Ch6 的 race condition。
+- Ch4 的 thread 比 Ch3 的 process 輕量，排程對象以 kernel-level thread 為主。
