@@ -1,4 +1,6 @@
-# OS 小講義--作業系統期中複習筆記網站
+# OS 小講義
+
+作業系統期中複習筆記網站，教材整理自政大資訊科學系孫士勝老師的課程。
 
 - 網頁：https://<帳號>.github.io/os-notes/
 - 規則文件：[AGENTS.md](AGENTS.md)
@@ -19,7 +21,6 @@ graph LR
   C --> D[Ch4 執行緒]
   C --> E[Ch5 CPU 排程]
   D --> E
-  E -->|搶先式造成| F[Ch6 同步]
 ```
 
 ## 本機預覽
@@ -36,8 +37,8 @@ python3 -m http.server
 把提示詞交給 AI：
 
 ```
-請先閱讀 AGENTS.md，再依照規則新增 lessons/os-04-threads.html。
-內容來源是 sources/04_OS_ThreadsConcurrency_v1.0.pdf。
+請先閱讀 AGENTS.md，再依照規則新增 lessons/os-06-ipc.html。
+內容來源是 sources/os_midterm_cheatsheet_long.md 第 4 節。
 完成後更新 lessons.json、concepts.json、llms.txt，
 並補上相鄰講義的連結，最後回報修改了哪些檔案。
 ```
