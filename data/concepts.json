@@ -1,8 +1,12 @@
 {
   "concepts": [
     { "id": "operating-system", "name": "作業系統", "defined_in": "os-01-introduction", "used_in": ["os-02-os-structure", "os-03-processes"] },
-    { "id": "system-call", "name": "System Call", "defined_in": "os-01-introduction", "used_in": ["os-02-os-structure"] },
+    { "id": "system-call", "name": "System Call", "defined_in": "os-01-introduction", "used_in": ["os-02-os-structure", "os-03-processes"] },
     { "id": "api", "name": "API", "defined_in": "os-02-os-structure", "used_in": [] },
+    { "id": "dual-mode", "name": "雙模式", "defined_in": "os-02-os-structure", "used_in": ["os-05-cpu-scheduling"] },
+    { "id": "parameter-passing", "name": "參數傳遞", "defined_in": "os-02-os-structure", "used_in": [] },
+    { "id": "boot-process", "name": "開機流程", "defined_in": "os-02-os-structure", "used_in": [] },
+    { "id": "kernel-structure", "name": "核心架構", "defined_in": "os-02-os-structure", "used_in": [] },
     { "id": "multiprogramming", "name": "多道程式", "defined_in": "os-01-introduction", "used_in": ["os-03-processes", "os-05-cpu-scheduling"] },
     { "id": "cpu-utilization", "name": "CPU 利用率", "defined_in": "os-01-introduction", "used_in": ["os-05-cpu-scheduling"] },
     { "id": "process", "name": "行程", "defined_in": "os-03-processes", "used_in": ["os-04-threads", "os-05-cpu-scheduling"] },
@@ -11,8 +15,11 @@
     { "id": "long-term-scheduler", "name": "Long-term Scheduler", "defined_in": "os-03-processes", "used_in": [] },
     { "id": "short-term-scheduler", "name": "Short-term Scheduler", "defined_in": "os-03-processes", "used_in": ["os-05-cpu-scheduling"] },
     { "id": "thread", "name": "執行緒", "defined_in": "os-04-threads", "used_in": ["os-05-cpu-scheduling"] },
-    { "id": "concurrency", "name": "並行", "defined_in": "os-04-threads", "used_in": [] },
+    { "id": "concurrency", "name": "並行", "defined_in": "os-04-threads", "used_in": ["os-05-cpu-scheduling"] },
     { "id": "parallelism", "name": "平行", "defined_in": "os-04-threads", "used_in": [] },
+    { "id": "amdahls-law", "name": "Amdahl 定律", "defined_in": "os-04-threads", "used_in": [] },
+    { "id": "threading-models", "name": "多執行緒模型", "defined_in": "os-04-threads", "used_in": [] },
+    { "id": "thread-pool", "name": "Thread Pool", "defined_in": "os-04-threads", "used_in": [] },
     { "id": "preemptive-scheduling", "name": "可搶先排程", "defined_in": "os-05-cpu-scheduling", "used_in": ["os-06-synchronization"] },
     { "id": "dispatcher", "name": "Dispatcher", "defined_in": "os-05-cpu-scheduling", "used_in": [] },
     { "id": "waiting-time", "name": "等待時間", "defined_in": "os-05-cpu-scheduling", "used_in": [] },
@@ -20,14 +27,18 @@
   ],
   "relations": [
     { "from": "operating-system", "type": "prerequisite_of", "to": "process" },
+    { "from": "dual-mode", "type": "prerequisite_of", "to": "system-call" },
+    { "from": "api", "type": "extends", "to": "system-call" },
     { "from": "multiprogramming", "type": "prerequisite_of", "to": "preemptive-scheduling" },
     { "from": "process-state-ready", "type": "prerequisite_of", "to": "preemptive-scheduling" },
     { "from": "short-term-scheduler", "type": "prerequisite_of", "to": "preemptive-scheduling" },
     { "from": "pcb", "type": "prerequisite_of", "to": "dispatcher" },
-    { "from": "preemptive-scheduling", "type": "causes", "to": "race-condition" },
     { "from": "thread", "type": "contrasts_with", "to": "process" },
     { "from": "parallelism", "type": "contrasts_with", "to": "concurrency" },
+    { "from": "amdahls-law", "type": "extends", "to": "parallelism" },
+    { "from": "thread-pool", "type": "example_of", "to": "threading-models" },
+    { "from": "thread", "type": "prerequisite_of", "to": "preemptive-scheduling" },
     { "from": "cpu-utilization", "type": "extends", "to": "multiprogramming" },
-    { "from": "api", "type": "extends", "to": "system-call" }
+    { "from": "preemptive-scheduling", "type": "causes", "to": "race-condition" }
   ]
 }
