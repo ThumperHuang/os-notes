@@ -61,20 +61,7 @@
     "status": "published",
     "file": "lessons/os-05-cpu-scheduling.html",
     "prerequisites": ["os-03-processes", "os-04-threads"],
-    "related": ["os-06-synchronization"],
-    "concepts": ["preemptive-scheduling", "dispatcher", "waiting-time"]
-  },
-  {
-    "id": "os-06-synchronization",
-    "title": "Ch6 行程同步",
-    "chapter": 6,
-    "category": "os",
-    "summary": "Race condition、臨界區間與同步工具",
-    "difficulty": 3,
-    "status": "planned",
-    "file": "lessons/os-06-synchronization.html",
-    "prerequisites": ["os-05-cpu-scheduling"],
     "related": [],
-    "concepts": ["race-condition"]
+    "concepts": ["preemptive-scheduling", "dispatcher", "waiting-time"]
   }
 ]
