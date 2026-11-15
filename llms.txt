@@ -14,7 +14,6 @@
 3. [Ch3 行程](lessons/os-03-processes.html)：需先讀 Ch1
 4. [Ch4 執行緒與並行](lessons/os-04-threads.html)：需先讀 Ch3
 5. [Ch5 CPU 排程](lessons/os-05-cpu-scheduling.html)：需先讀 Ch3、Ch4
-6. Ch6 行程同步（即將推出）：需先讀 Ch5
 
 ## 跨章關聯
 - Ch2 的雙模式與 Trap 是 System Call 的運作基礎。
@@ -22,4 +21,3 @@
 - Ch3 的 Ready queue 是 Ch5 的排程對象。
 - Ch3 的 Process 與 Ch4 的 Thread 是對比關係：Thread 共享記憶體，成本較低。
 - Ch4 的 kernel-level thread 是 Ch5 實際排程的對象。
-- Ch5 的 preemptive scheduling 會造成 Ch6 的 race condition。
