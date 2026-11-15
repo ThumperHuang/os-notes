@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ch4 執行緒與並行 | OS 小講義</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+  <article class="lesson"
+    data-id="os-04-threads"
+    data-prereq="os-03-processes"
+    data-leads-to="os-05-cpu-scheduling">
+
+    <h1>Ch4 執行緒與並行 Threads &amp; Concurrency</h1>
+    <p class="meta">來源：04_OS_ThreadsConcurrency_v1.0.pdf、期中摘要（Amdahl 定律、多執行緒模型、隱含執行緒）</p>
+
+    <h2>學習目標</h2>
+    <ul>
+      <li>說明執行緒（Thread）共享與不共享的資源，以及多執行緒的四大好處</li>
+      <li>分辨並行（Concurrency）與平行（Parallelism），並會計算 Amdahl 定律</li>
+      <li>比較三種多執行緒模型與隱含執行緒技術</li>
+    </ul>
+
+    <h2>直覺說明</h2>
+    <p>Process 像一間獨立的廚房，有自己的爐具與食材。Thread 則像同一間廚房裡的多位廚師：共用爐具與食材（記憶體、檔案），但各自有一本進度筆記（PC、暫存器）和一個工作檯（Stack）。</p>
+    <p>多位廚師共用資源，所以合作快、開新廚師的成本也低；代價是兩人同時搶同一個鍋子時，必須協調（下一章同步的主題）。</p>
+
+    <h2>核心概念</h2>
+
+    <h3>Thread 共享與不共享</h3>
+    <table>
+      <tr><th>共享（同一 Process 內）</th><th>不共享（各自擁有）</th></tr>
+      <tr><td>Code、Data（靜態／全域變數）、OS 資源（如開啟的檔案、signal）</td><td>Thread ID、Program counter、Register set、Stack</td></tr>
+    </table>
+
+    <h3>多執行緒的四大好處</h3>
+    <table>
+      <tr><th>好處</th><th>說明</th></tr>
+      <tr><td>Responsiveness</td><td>某部分阻塞或耗時，程式仍可回應使用者</td></tr>
+      <tr><td>Resource sharing</td><td>預設共享所屬 Process 的記憶體，比 IPC 容易</td></tr>
+      <tr><td>Economy</td><td>建立與切換成本低；Solaris 中建立 Process 約比建立 Thread 慢 30 倍，context switch 約慢 5 倍</td></tr>
+      <tr><td>Scalability</td><td>可在多核心上平行執行；單執行緒 Process 只能用一個核心</td></tr>
+    </table>
+    <p>適合多執行緒的例子：批次產生縮圖、文書編輯器（顯示、輸入、拼字檢查各一個 Thread）、網頁瀏覽器、網路伺服器（one request／thread 比 one request／process 效能佳）。</p>
+
+    <h3>並行與平行</h3>
+    <table>
+      <tr><th></th><th>Concurrency 並行</th><th>Parallelism 平行</th></tr>
+      <tr><td>定義</td><td>多個任務都有進展</td><td>多個任務同時執行</td></tr>
+      <tr><td>單核心</td><td>可以（靠排程器快速切換）</td><td>不行</td></tr>
+      <tr><td>多核心</td><td>可以</td><td>可以</td></tr>
+    </table>
+    <p>結論：<strong>可以有並行而沒有平行</strong>，但有平行就一定有並行。</p>
+
+    <h3>多核心程式設計的挑戰</h3>
+    <ul>
+      <li>Identify tasks：找出可平行化的任務</li>
+      <li>Balance：平均分配各核心的工作</li>
+      <li>Data splitting：資料也要切分</li>
+      <li>Data dependency：檢查任務間的資料相依</li>
+      <li>Testing and debugging：平行程式更難除錯</li>
+    </ul>
+
+    <h3>Amdahl 定律（Amdahl's Law）</h3>
+    <div class="formula">Speedup ≤ 1 / ( S + (1 - S) / N )</div>
+    <p>S 是程式中必須循序執行的比例，N 是核心數。當 N 趨近無限大，加速上限為 1 / S。</p>
+
+    <h3>多執行緒模型</h3>
+    <table>
+      <tr><th>模型</th><th>對應方式</th><th>特色</th></tr>
+      <tr><td>Many-to-One</td><td>多個 user thread 對一個 kernel thread</td><td>一個 thread 阻塞，全部都阻塞；無法利用多核心</td></tr>
+      <tr><td>One-to-One</td><td>每個 user thread 對一個 kernel thread</td><td>並行度最佳（Windows、Linux 採用）</td></tr>
+      <tr><td>Many-to-Many</td><td>多個 user thread 對較少或相等數量的 kernel thread</td><td>彈性高</td></tr>
+    </table>
+
+    <h3>隱含執行緒（Implicit Threading）</h3>
+    <ul>
+      <li><strong>Thread pool</strong>：預先建立好 thread 等待工作，省去建立成本。</li>
+      <li><strong>Fork-Join</strong>：任務切開（fork）後，再合併結果（join）。</li>
+      <li><strong>OpenMP</strong>：C／C++ 的編譯器指示詞，標記平行區域。</li>
+      <li><strong>Grand Central Dispatch（GCD）</strong>：Apple 以 dispatch queue 管理任務。</li>
+    </ul>
+    <p>另外，Thread-Local Storage（TLS）是每個 Thread 專屬的資料。</p>
+
+    <h2>程式或範例</h2>
+    <p>用兩個 Thread 分別計算 1～50 與 51～100 的總和，再由主執行緒加總。編譯時要加 <code>-pthread</code>。</p>
+    <pre><code class="lang-c">/* 編譯：gcc sum.c -o sum -pthread */
+#include &lt;stdio.h&gt;
+#include &lt;pthread.h&gt;
+
+static long partial[2];   /* 每個 thread 寫入自己的位置，不會互相干擾 */
+
+void *worker(void *arg) {
+    int id = *(int *)arg;
+    int start = id * 50 + 1;
+    int end = start + 49;
+    long sum = 0;
+
+    for (int i = start; i &lt;= end; i++) {
+        sum += i;
+    }
+    partial[id] = sum;
+    return NULL;
+}
+
+int main(void) {
+    pthread_t tid[2];
+    int ids[2] = {0, 1};
+
+    for (int i = 0; i &lt; 2; i++) {
+        pthread_create(&amp;tid[i], NULL, worker, &amp;ids[i]);
+    }
+    for (int i = 0; i &lt; 2; i++) {
+        pthread_join(tid[i], NULL);   /* 等 thread 結束 */
+    }
+    printf("total = %ld\n", partial[0] + partial[1]);
+    return 0;
+}</code></pre>
+    <p><strong>預期輸出：</strong></p>
+    <pre><code>total = 5050</code></pre>
+
+    <p><strong>Amdahl 計算範例：</strong>程式有 75% 可平行化（S = 0.25），在 2 個核心上：</p>
+    <pre><code>Speedup = 1 / (0.25 + 0.75 / 2)
+        = 1 / 0.625
+        = 1.6 倍</code></pre>
+
+    <h2>考試重點</h2>
+    <div class="callout">
+      <ul>
+        <li>Thread 共享哪些資源、各自擁有哪些資源。</li>
+        <li>多執行緒的四大好處（Responsiveness、Resource sharing、Economy、Scalability）。</li>
+        <li>並行與平行的差別：單核心只能並行，不能平行。</li>
+        <li>Amdahl 定律的計算，以及加速上限 1 / S。</li>
+        <li>三種多執行緒模型的差異，尤其 Many-to-One 一個阻塞全部阻塞。</li>
+      </ul>
+    </div>
+
+    <h2>常見錯誤</h2>
+    <ul>
+      <li>把並行當成平行。單核心靠快速切換只是「並行」。</li>
+      <li>以為 Thread 共用 Stack。實際上每個 Thread 有自己的 Stack 和暫存器。</li>
+      <li>Amdahl 定律把 S 與 1 - S 放反。S 是「循序」的比例。</li>
+    </ul>
+
+    <h2>練習題</h2>
+    <details><summary>題目 1：S = 0.25、N = 4，加速比上限是多少？</summary>
+      <p>Speedup = 1 / (0.25 + 0.75 / 4) = 1 / 0.4375 ≈ 2.29 倍。</p></details>
+    <details><summary>題目 2：N 趨近無限大時，S = 0.2 的程式最多加速幾倍？</summary>
+      <p>上限為 1 / S = 1 / 0.2 = 5 倍。</p></details>
+    <details><summary>題目 3：為什麼 Many-to-One 模型無法善用多核心？</summary>
+      <p>所有 user thread 都對應到同一個 kernel thread，一次只能有一個在核心上執行；而且其中一個阻塞時，整個 Process 都會被阻塞。</p></details>
+
+    <h2>相關單元</h2>
+    <ul class="rel">
+      <li>先備：<a href="os-03-processes.html" data-rel="contrasts_with">Ch3 行程</a>（Thread 與 Process 的對比：Thread 輕量，Process 資源獨立）</li>
+      <li>延伸：<a href="os-05-cpu-scheduling.html" data-rel="prerequisite_of">Ch5 CPU 排程</a>（現代 OS 排程的對象是 kernel-level thread）</li>
+      <li>延伸：Ch6 行程同步（共享資料造成 race condition，即將推出）</li>
+    </ul>
+
+    <nav>
+      <a href="os-03-processes.html">← 上一篇：Ch3</a>
+      <a href="../index.html">回首頁</a>
+      <a href="os-05-cpu-scheduling.html">下一篇：Ch5 →</a>
+    </nav>
+  </article>
+</body>
+</html>
