@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ch2 作業系統結構 | OS 小講義</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+  <article class="lesson"
+    data-id="os-02-os-structure"
+    data-prereq="os-01-introduction"
+    data-leads-to="os-03-processes">
+
+    <h1>Ch2 作業系統結構</h1>
+    <p class="meta">來源：02_OS_OS Structure_v1.0.pdf、期中摘要（雙模式、開機流程、核心架構）</p>
+
+    <h2>學習目標</h2>
+    <ul>
+      <li>說明 System Call 與 API 的關係，以及參數傳遞的三種方法</li>
+      <li>解釋雙模式（Dual-Mode）與計時器（Timer）如何保護系統</li>
+      <li>列出開機流程，並比較單體式核心與微核心</li>
+    </ul>
+
+    <h2>直覺說明</h2>
+    <p>把作業系統想成一棟有警衛的大樓。一般住戶（User Mode）只能待在自己的房間；想使用機房或倉庫（硬體），必須走到櫃檯，填表請警衛（Kernel Mode）代辦。這張表單就是 System Call。</p>
+    <p>API 則像櫃檯旁貼的「辦事指南」：你照指南填，指南會幫你轉成正確的表單。你不需要知道表單的細節編號，所以同一份指南可以在不同大樓使用（可攜性）。</p>
+
+    <h2>核心概念</h2>
+
+    <h3>使用者介面（User Interface）</h3>
+    <table>
+      <tr><th>介面</th><th>說明</th><th>例子</th></tr>
+      <tr><td>CLI</td><td>Shell 解析並執行指令；內建指令已載入記憶體，外部指令依 PATH 尋找</td><td>BASH、KSH、CSH</td></tr>
+      <tr><td>GUI</td><td>以圖示與滑鼠操作，1970 年代發明於 Xerox PARC</td><td>Windows、macOS、GNOME</td></tr>
+      <tr><td>TUI</td><td>以觸控手勢操作</td><td>行動裝置</td></tr>
+      <tr><td>VUI</td><td>以語音操作</td><td>語音助理</td></tr>
+    </table>
+
+    <h3>System Call 與 API</h3>
+    <ul>
+      <li><strong>System Call</strong>：程式與 OS 之間的介面，透過軟體中斷（Trap）向 Kernel 發出明確請求。</li>
+      <li><strong>API</strong>：包裝 System Call 的函式，例如 Windows 的 Win32 API、UNIX／Linux／macOS 的 POSIX API。</li>
+      <li>例子：C 程式呼叫 <code>printf()</code>，C 函式庫（如 glibc）會攔截並改呼叫 <code>write()</code> 這個 System Call，再把回傳值交還給程式。</li>
+    </ul>
+    <table>
+      <tr><th>類別</th><th>範例</th></tr>
+      <tr><td>Process control</td><td>建立、結束行程；配置與釋放記憶體</td></tr>
+      <tr><td>File management</td><td>建立、刪除、開啟、關閉檔案</td></tr>
+      <tr><td>Device management</td><td>讀、寫、重新定位裝置</td></tr>
+      <tr><td>Information maintenance</td><td>取得時間或日期</td></tr>
+      <tr><td>Communications</td><td>傳送、接收訊息</td></tr>
+    </table>
+
+    <h3>參數傳遞的三種方法</h3>
+    <table>
+      <tr><th>方法</th><th>做法</th><th>特色</th></tr>
+      <tr><td>Registers</td><td>參數直接放在暫存器</td><td>最簡單、最快，但暫存器數量有限</td></tr>
+      <tr><td>Block／Table</td><td>參數放在記憶體區塊，把區塊位址放在暫存器</td><td>不限參數數量；Linux 在參數超過 5 個時採用</td></tr>
+      <tr><td>Stack</td><td>程式 push 參數，OS 再 pop 取出</td><td>不限參數數量與長度</td></tr>
+    </table>
+    <p>Linux 的規則：<strong>5 個（含）以下用暫存器，超過 5 個改用 block／table</strong>。</p>
+
+    <h3>雙模式與計時器（Dual-Mode &amp; Timer）</h3>
+    <table>
+      <tr><th>模式</th><th>Mode bit</th><th>權限</th></tr>
+      <tr><td>User Mode</td><td>1</td><td>只能存取受限的硬體</td></tr>
+      <tr><td>Kernel（Privileged）Mode</td><td>0</td><td>可執行所有指令、存取所有硬體</td></tr>
+    </table>
+    <ul>
+      <li><strong>Privileged instruction</strong> 只能在 Kernel Mode 執行，例如 I/O 控制與計時器管理。</li>
+      <li>System Call 會發出 Trap，把 User Mode 切換到 Kernel Mode，完成後再切回來。</li>
+      <li><strong>Timer</strong>：OS 設定計數器並遞減，歸零時產生硬體中斷，把控制權還給 OS，避免單一行程霸佔 CPU。</li>
+    </ul>
+
+    <h3>開機流程（Boot Process）</h3>
+    <ol>
+      <li>Firmware（BIOS／UEFI）：初始化硬體。</li>
+      <li>第二階段 Bootloader（GRUB）：找到核心映像檔並傳入參數。</li>
+      <li>核心初始化：核心（<code>vmlinuz</code>）解壓縮並初始化驅動程式與子系統。</li>
+      <li>掛載根目錄（Root Mount）。</li>
+      <li>Systemd／Init：第一個 user-space 行程，啟動各種 daemon。</li>
+    </ol>
+
+    <h3>核心架構</h3>
+    <table>
+      <tr><th>類型</th><th>說明</th><th>例子</th></tr>
+      <tr><td>Monolithic 單體式核心</td><td>所有 OS 服務都在 Kernel Space 執行</td><td>Linux</td></tr>
+      <tr><td>Microkernel 微核心</td><td>非必要元件移到 User Space</td><td>（補充）Mach、QNX</td></tr>
+    </table>
+
+    <h2>程式或範例</h2>
+    <p>用 <code>getpid()</code> 與 <code>syscall(SYS_getpid)</code> 比較「API 包裝」與「直接發出 System Call」，兩者結果相同（需在 Linux 編譯）。</p>
+    <pre><code class="lang-c">#include &lt;stdio.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;sys/syscall.h&gt;
+
+int main(void) {
+    pid_t via_api = getpid();                 /* 透過 C 函式庫包裝 */
+    pid_t via_syscall = syscall(SYS_getpid);  /* 直接指定 System Call 編號 */
+
+    printf("equal: %s\n", via_api == via_syscall ? "yes" : "no");
+    return 0;
+}</code></pre>
+    <p><strong>預期輸出：</strong></p>
+    <pre><code>equal: yes</code></pre>
+
+    <p><strong>用 strace 觀察 System Call：</strong>（實際次數依環境而異）</p>
+    <pre><code>strace -o hello.log ./hello      # 每一行是一個 System Call
+strace -c ./hello                # 統計各 System Call 的次數</code></pre>
+    <p>投影片的示範：C++ 的 Hello World 約 71 個 System Call，Python 的 <code>print('Hello')</code> 約 687 個。一個簡單動作往往需要許多 System Call。</p>
+
+    <h2>考試重點</h2>
+    <div class="callout">
+      <ul>
+        <li>System Call 與 API 的關係：API 包裝 System Call，例如 printf() → write()。</li>
+        <li>參數傳遞三種方法，以及 Linux「5 個以內用暫存器」的規則。</li>
+        <li>Mode bit：User Mode = 1、Kernel Mode = 0；哪些屬於 Privileged instruction。</li>
+        <li>Timer 的作用與運作方式（遞減到 0 產生中斷）。</li>
+        <li>開機五步驟，以及 Monolithic 與 Microkernel 的比較。</li>
+      </ul>
+    </div>
+
+    <h2>常見錯誤</h2>
+    <ul>
+      <li>把 <code>printf()</code> 當成 System Call。它是 C 函式庫的函式，最後才呼叫 <code>write()</code>。</li>
+      <li>記反 Mode bit：User Mode 是 1，Kernel Mode 是 0。</li>
+      <li>以為 API 與 System Call 一一對應。一個 API 可能呼叫多個 System Call。</li>
+    </ul>
+
+    <h2>練習題</h2>
+    <details><summary>題目 1：為什麼使用者程式不能直接執行 I/O 指令？</summary>
+      <p>I/O 控制是 Privileged instruction，只能在 Kernel Mode 執行。使用者程式必須發出 System Call，由 OS 在 Kernel Mode 代為執行，才能保護系統。</p></details>
+    <details><summary>題目 2：某 System Call 需要 7 個參數，Linux 會怎麼傳？</summary>
+      <p>超過 5 個，改用 block／table：把參數放在記憶體區塊，並把區塊位址放在暫存器傳給 Kernel。</p></details>
+    <details><summary>題目 3：Timer 如何防止一個行程霸佔 CPU？</summary>
+      <p>OS 先設定計數器並讓它遞減，歸零時硬體發出中斷，控制權回到 OS，OS 就能重新排程。</p></details>
+
+    <h2>相關單元</h2>
+    <ul class="rel">
+      <li>先備：<a href="os-01-introduction.html" data-rel="prerequisite_of">Ch1 作業系統導論</a>（Shell 與 System Call 的角色）</li>
+      <li>延伸：<a href="os-03-processes.html" data-rel="extends">Ch3 行程</a>（fork()、wait() 都是 Process control 類的 System Call）</li>
+    </ul>
+
+    <nav>
+      <a href="os-01-introduction.html">← 上一篇：Ch1</a>
+      <a href="../index.html">回首頁</a>
+      <a href="os-03-processes.html">下一篇：Ch3 →</a>
+    </nav>
+  </article>
+</body>
+</html>
