@@ -2,7 +2,7 @@
 
 作業系統期中複習筆記網站，教材整理自政大資訊科學系孫士勝老師的課程。
 
-- 網頁：https://<帳號>.github.io/os-notes/
+- 網頁：https://thumperhuang.github.io/os-notes/index.html
 - 規則文件：[AGENTS.md](AGENTS.md)
 - 給 AI 的導覽：[llms.txt](llms.txt)
 
