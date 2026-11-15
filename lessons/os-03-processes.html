@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ch3 行程 | OS 小講義</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+  <article class="lesson"
+    data-id="os-03-processes"
+    data-prereq="os-01-introduction"
+    data-leads-to="os-04-threads,os-05-cpu-scheduling">
+
+    <h1>Ch3 行程 Processes</h1>
+    <p class="meta">來源：03_OS_Processes_v1.0.pdf</p>
+
+    <h2>學習目標</h2>
+    <ul>
+      <li>分辨 Program 與 Process</li>
+      <li>畫出五種行程狀態與轉換</li>
+      <li>說明 PCB 內容與排程器的種類</li>
+    </ul>
+
+    <h2>直覺說明</h2>
+    <p>Program 像一份食譜，是寫在紙上的靜態檔案。Process 像廚師照著食譜實際在煮菜，有進度、有用到的鍋碗瓢盆。同一份食譜可以讓兩位廚師同時照做，它們是兩個獨立的 Process。</p>
+
+    <h2>核心概念</h2>
+    <table>
+      <tr><th></th><th>Program</th><th>Process</th></tr>
+      <tr><td>性質</td><td>被動（passive）</td><td>主動（active）</td></tr>
+      <tr><td>位置</td><td>磁碟上的可執行檔</td><td>記憶體中執行的程式</td></tr>
+      <tr><td>擁有</td><td>指令</td><td>PC、暫存器、資源</td></tr>
+    </table>
+
+    <h3>Process 在記憶體中的配置</h3>
+    <ul>
+      <li><strong>Text</strong>：程式碼</li>
+      <li><strong>Data</strong>：靜態與全域變數</li>
+      <li><strong>Heap</strong>：動態配置（malloc）</li>
+      <li><strong>Stack</strong>：函式呼叫的 activation record（參數、區域變數、返回位址）</li>
+    </ul>
+    <p>同一程式開兩個 Process 時，Text 相同，但 Heap 和 Stack 各自獨立。</p>
+
+    <h3>五種狀態</h3>
+    <table>
+      <tr><th>狀態</th><th>意義</th></tr>
+      <tr><td>New</td><td>正在建立</td></tr>
+      <tr><td>Ready</td><td>在記憶體等 CPU（有意願跑，沒在跑）</td></tr>
+      <tr><td>Running</td><td>CPU 正在執行指令</td></tr>
+      <tr><td>Waiting</td><td>等待事件，如 I/O（沒意願跑）</td></tr>
+      <tr><td>Terminated</td><td>已結束</td></tr>
+    </table>
+    <p>Running 離開 CPU 的情況：被搶先（→ Ready）、等待 I/O（→ Waiting）、結束（→ Terminated）。</p>
+
+    <h3>PCB（Process Control Block）</h3>
+    <p>Kernel 為每個 Process 維護一個 PCB，內容包含：Process state、Program counter、CPU registers、CPU scheduling information、Memory-management information、Accounting information、I/O status information。Linux 中以 <code>task_struct</code> 實作。</p>
+
+    <h3>排程器</h3>
+    <table>
+      <tr><th>種類</th><th>工作</th><th>頻率</th></tr>
+      <tr><td>Long-term（Job scheduler）</td><td>決定哪些 Process 進入 ready queue，控制 degree of multiprogramming</td><td>低（秒、分鐘）</td></tr>
+      <tr><td>Short-term（CPU scheduler）</td><td>選下一個要跑的 Process</td><td>高（毫秒），必須快</td></tr>
+    </table>
+    <ul>
+      <li><strong>I/O-bound</strong>：大量短 CPU burst</li>
+      <li><strong>CPU-bound</strong>：少量長 CPU burst</li>
+    </ul>
+
+    <h2>程式或範例</h2>
+    <pre><code class="lang-c">#include &lt;stdio.h&gt;
+#include &lt;sys/types.h&gt;
+#include &lt;sys/wait.h&gt;
+#include &lt;unistd.h&gt;
+
+int main(void) {
+    pid_t pid = fork();            /* 建立子行程 */
+    if (pid &lt; 0) {
+        perror("fork");
+        return 1;
+    } else if (pid == 0) {
+        printf("child: pid=%d\n", getpid());
+    } else {
+        wait(NULL);                /* 等子行程結束 */
+        printf("parent: child done\n");
+    }
+    return 0;
+}</code></pre>
+    <p><strong>預期輸出</strong>（pid 數字依系統而異）：</p>
+    <pre><code>child: pid=12346
+parent: child done</code></pre>
+
+    <h2>考試重點</h2>
+    <div class="callout">
+      <ul>
+        <li>Program（passive）與 Process（active）的差別。</li>
+        <li>五種狀態圖，以及 Ready 與 Waiting 的差異。</li>
+        <li>PCB 包含哪些欄位。</li>
+        <li>Long-term 與 Short-term scheduler 的差異。</li>
+        <li>Stack 與 Heap 的用途，且成長方向相反。</li>
+      </ul>
+    </div>
+
+    <h2>常見錯誤</h2>
+    <ul>
+      <li>把 Waiting 和 Ready 混淆。Ready 是在等 CPU，Waiting 是在等事件（如 I/O）。</li>
+      <li>以為兩個執行同一程式的 Process 共用 Heap 和 Stack。實際上只有 Text 相同。</li>
+    </ul>
+
+    <h2>練習題</h2>
+    <details><summary>題目 1：Process 等待 I/O 完成後會進入哪個狀態？</summary>
+      <p>Ready。I/O 完成後它有意願跑，但需重新排隊等 CPU。</p></details>
+    <details><summary>題目 2：Degree of multiprogramming 由哪個排程器控制？</summary>
+      <p>Long-term scheduler。</p></details>
+
+    <h2>相關單元</h2>
+    <ul class="rel">
+      <li>先備：<a href="os-01-introduction.html" data-rel="prerequisite_of">Ch1 作業系統導論</a>（Multiprogramming 的概念）</li>
+      <li>對比：Ch4 執行緒與並行（Thread 與 Process 的比較，即將推出）</li>
+      <li>延伸：<a href="os-05-cpu-scheduling.html" data-rel="prerequisite_of">Ch5 CPU 排程</a>（Ready queue 是排程的對象）</li>
+    </ul>
+
+    <nav>
+      <span class="meta">上一篇：Ch2 即將推出</span>
+      <a href="../index.html">回首頁</a>
+      <span class="meta">下一篇：Ch4 即將推出</span>
+    </nav>
+  </article>
+</body>
+</html>
