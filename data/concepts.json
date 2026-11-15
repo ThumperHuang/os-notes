@@ -20,10 +20,9 @@
     { "id": "amdahls-law", "name": "Amdahl 定律", "defined_in": "os-04-threads", "used_in": [] },
     { "id": "threading-models", "name": "多執行緒模型", "defined_in": "os-04-threads", "used_in": [] },
     { "id": "thread-pool", "name": "Thread Pool", "defined_in": "os-04-threads", "used_in": [] },
-    { "id": "preemptive-scheduling", "name": "可搶先排程", "defined_in": "os-05-cpu-scheduling", "used_in": ["os-06-synchronization"] },
+    { "id": "preemptive-scheduling", "name": "可搶先排程", "defined_in": "os-05-cpu-scheduling", "used_in": [] },
     { "id": "dispatcher", "name": "Dispatcher", "defined_in": "os-05-cpu-scheduling", "used_in": [] },
-    { "id": "waiting-time", "name": "等待時間", "defined_in": "os-05-cpu-scheduling", "used_in": [] },
-    { "id": "race-condition", "name": "競爭條件", "defined_in": "os-06-synchronization", "used_in": [] }
+    { "id": "waiting-time", "name": "等待時間", "defined_in": "os-05-cpu-scheduling", "used_in": [] }
   ],
   "relations": [
     { "from": "operating-system", "type": "prerequisite_of", "to": "process" },
@@ -38,7 +37,6 @@
     { "from": "amdahls-law", "type": "extends", "to": "parallelism" },
     { "from": "thread-pool", "type": "example_of", "to": "threading-models" },
     { "from": "thread", "type": "prerequisite_of", "to": "preemptive-scheduling" },
-    { "from": "cpu-utilization", "type": "extends", "to": "multiprogramming" },
-    { "from": "preemptive-scheduling", "type": "causes", "to": "race-condition" }
+    { "from": "cpu-utilization", "type": "extends", "to": "multiprogramming" }
   ]
 }
