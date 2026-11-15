@@ -119,3 +119,8 @@
 - 引用其他章的概念時，要用連結並加上 `data-rel`，值必須是上述五種之一。
 - 若關聯對象的章節尚未發布（planned），只寫文字，不放連結。
 - 新增章節後，要同步檢查 `README.md` 內的 Mermaid 學習路徑圖。
+- `data-rel` 的語意是「連結目標與本章的關係」：
+  - 連結到先備章節 → `data-rel="prerequisite_of"`（目標是本章的先備）
+  - 連結到延伸章節 → `data-rel="extends"`（目標延伸自本章）
+  - 連結到對比章節 → `data-rel="contrasts_with"`
+- 「相關單元」每一行的前綴文字（先備／延伸／對比）必須與 `data-rel` 一致。
