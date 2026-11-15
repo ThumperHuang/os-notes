@@ -17,13 +17,13 @@
     "title": "Ch2 作業系統結構",
     "chapter": 2,
     "category": "os",
-    "summary": "使用者介面、System Call、API",
+    "summary": "System Call、API、雙模式與開機流程",
     "difficulty": 2,
-    "status": "planned",
+    "status": "published",
     "file": "lessons/os-02-os-structure.html",
     "prerequisites": ["os-01-introduction"],
     "related": ["os-03-processes"],
-    "concepts": ["system-call", "api"]
+    "concepts": ["system-call", "api", "dual-mode", "parameter-passing", "boot-process", "kernel-structure"]
   },
   {
     "id": "os-03-processes",
@@ -35,7 +35,7 @@
     "status": "published",
     "file": "lessons/os-03-processes.html",
     "prerequisites": ["os-01-introduction"],
-    "related": ["os-04-threads", "os-05-cpu-scheduling"],
+    "related": ["os-02-os-structure", "os-04-threads", "os-05-cpu-scheduling"],
     "concepts": ["process", "process-state-ready", "pcb", "long-term-scheduler", "short-term-scheduler"]
   },
   {
@@ -43,13 +43,13 @@
     "title": "Ch4 執行緒與並行",
     "chapter": 4,
     "category": "os",
-    "summary": "Thread、並行與平行、多執行緒模型",
+    "summary": "Thread、並行與平行、Amdahl 定律、執行緒模型",
     "difficulty": 2,
-    "status": "planned",
+    "status": "published",
     "file": "lessons/os-04-threads.html",
     "prerequisites": ["os-03-processes"],
     "related": ["os-05-cpu-scheduling"],
-    "concepts": ["thread", "concurrency", "parallelism"]
+    "concepts": ["thread", "concurrency", "parallelism", "amdahls-law", "threading-models", "thread-pool"]
   },
   {
     "id": "os-05-cpu-scheduling",
