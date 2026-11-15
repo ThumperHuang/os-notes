@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ch5 CPU 排程 | OS 小講義</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+  <article class="lesson"
+    data-id="os-05-cpu-scheduling"
+    data-prereq="os-03-processes,os-04-threads"
+    data-leads-to="os-06-synchronization">
+
+    <h1>Ch5 CPU 排程</h1>
+    <p class="meta">來源：05_OS_CPU Scheduling_v1.0.pdf</p>
+
+    <h2>學習目標</h2>
+    <ul>
+      <li>說明 preemptive 與 non-preemptive 的差別</li>
+      <li>列出排程指標並計算 waiting time</li>
+      <li>比較 FCFS、SJF、Round-Robin</li>
+    </ul>
+
+    <h2>直覺說明</h2>
+    <p>排程像銀行叫號。叫號規則再怎麼設計，每位客人辦業務的時間都不會變，能降低的只有「大家在等待區白白坐著的時間」。所以排程只影響等待時間，不影響工作本身要花多久。</p>
+
+    <h2>核心概念</h2>
+    <h3>Preemptive vs Non-preemptive</h3>
+    <p>排程決策可能發生在四種情況：(1) Running → Waiting，(2) Running → Ready，(3) Waiting → Ready，(4) Terminated。</p>
+    <table>
+      <tr><th>類型</th><th>排程時機</th><th>說明</th></tr>
+      <tr><td>Non-preemptive</td><td>只在 1、4</td><td>沒意願才換人</td></tr>
+      <tr><td>Preemptive</td><td>1～4 都可能</td><td>現代 OS 皆採用，但可能造成 race condition，需要同步機制</td></tr>
+    </table>
+    <p><strong>Dispatcher</strong> 負責切換 context、切到 user mode、跳到正確的 PC。<strong>Dispatch latency</strong> 是停止一個 Process 到啟動另一個的時間。</p>
+
+    <h3>排程指標</h3>
+    <table>
+      <tr><th>指標</th><th>意義</th></tr>
+      <tr><td>CPU utilization</td><td>CPU 忙碌比例</td></tr>
+      <tr><td>Throughput</td><td>單位時間完成的工作數</td></tr>
+      <tr><td>Turnaround time</td><td>從提交到完成的總時間</td></tr>
+      <tr><td>Waiting time</td><td>在 ready queue 的總等待時間</td></tr>
+      <tr><td>Response time</td><td>從提交到第一次回應的時間</td></tr>
+    </table>
+    <div class="formula">Turnaround = Waiting + Burst（假設不含 I/O）</div>
+
+    <h3>三種演算法</h3>
+    <ul>
+      <li><strong>FCFS</strong>：先到先服務。簡單，但會有 convoy effect（長工作擋住短工作）。</li>
+      <li><strong>SJF</strong>：最短工作優先。平均等待時間最短，但需要預測下一個 burst。</li>
+      <li><strong>Round-Robin（RR）</strong>：每人輪流一個 time quantum，適合互動系統。</li>
+    </ul>
+
+    <h2>程式或範例</h2>
+    <p>三個工作同時在時間 0 到達：P1 = 24、P2 = 3、P3 = 3（單位 ms）。</p>
+    <table>
+      <tr><th>演算法</th><th>執行順序</th><th>等待時間（P1, P2, P3）</th><th>平均</th></tr>
+      <tr><td>FCFS</td><td>P1 → P2 → P3</td><td>0, 24, 27</td><td>17</td></tr>
+      <tr><td>SJF</td><td>P2 → P3 → P1</td><td>6, 0, 3</td><td>3</td></tr>
+      <tr><td>RR（q = 4）</td><td>P1(0-4) P2(4-7) P3(7-10) P1(10-30)</td><td>6, 4, 7</td><td>5.67</td></tr>
+    </table>
+    <p><strong>FCFS 算式：</strong></p>
+    <pre><code>P1 waiting = 0
+P2 waiting = 24
+P3 waiting = 24 + 3 = 27
+average    = (0 + 24 + 27) / 3 = 17</code></pre>
+    <p><strong>RR 算式（q = 4）：</strong>P1 最後在 30 完成，waiting = 30 - 24 = 6；P2 在 4～7 執行，waiting = 4；P3 在 7～10 執行，waiting = 7；平均 = (6 + 4 + 7) / 3 ≈ 5.67。</p>
+    <p>用以下 C 程式驗算 FCFS：</p>
+    <pre><code class="lang-c">#include &lt;stdio.h&gt;
+
+int main(void) {
+    int burst[] = {24, 3, 3};
+    int n = 3, wait = 0, total = 0;
+
+    for (int i = 0; i &lt; n; i++) {
+        printf("P%d waiting = %d\n", i + 1, wait);
+        total += wait;
+        wait += burst[i];
+    }
+    printf("average = %.2f\n", (double)total / n);
+    return 0;
+}</code></pre>
+    <p><strong>預期輸出：</strong></p>
+    <pre><code>P1 waiting = 0
+P2 waiting = 24
+P3 waiting = 27
+average = 17.00</code></pre>
+
+    <h2>考試重點</h2>
+    <div class="callout">
+      <ul>
+        <li>Non-preemptive 只在「Running → Waiting」和「Terminated」時排程。</li>
+        <li>排程只縮短等待時間，不縮短個別工作的執行時間。</li>
+        <li>SJF 的平均等待時間最佳，但無法事先知道 burst。</li>
+        <li>FCFS 會有 convoy effect。</li>
+        <li>I/O-bound 有大量短 burst，CPU-bound 有少量長 burst。</li>
+      </ul>
+    </div>
+
+    <h2>常見錯誤</h2>
+    <ul>
+      <li>把 response time 和 turnaround time 搞混。前者是第一次回應，後者是完成。</li>
+      <li>算 RR 時忘記 P1 被切走後，還要再排回佇列尾端。</li>
+    </ul>
+
+    <h2>練習題</h2>
+    <details><summary>題目 1：P1 = 6、P2 = 8、P3 = 7，同時到達，用 SJF 求平均等待時間。</summary>
+      <p>順序 P1 → P3 → P2。等待時間 0、6、13，平均 = 19 / 3 ≈ 6.33。</p></details>
+    <details><summary>題目 2：為什麼 preemptive 排程可能造成 race condition？</summary>
+      <p>Process 在修改共享資料到一半時被搶走，另一個 Process 讀到不一致的狀態，所以需要同步機制。</p></details>
+
+    <h2>相關單元</h2>
+    <ul class="rel">
+      <li>先備：<a href="os-03-processes.html" data-rel="prerequisite_of">Ch3 行程</a>（Ready queue、Process 狀態、Short-term scheduler）</li>
+      <li>先備：Ch4 執行緒與並行（排程對象以 kernel-level thread 為主，即將推出）</li>
+      <li>延伸：Ch6 行程同步（Preemptive 排程造成 race condition，即將推出）</li>
+    </ul>
+
+    <nav>
+      <span class="meta">上一篇：Ch4 即將推出</span>
+      <a href="../index.html">回首頁</a>
+      <span class="meta">下一篇：Ch6 即將推出</span>
+    </nav>
+  </article>
+</body>
+</html>
