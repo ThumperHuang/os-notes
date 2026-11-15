@@ -14,7 +14,8 @@
 
 ## 3. 目錄與命名
 - 講義放 `lessons/`，檔名：`os-{兩位數章次}-{英文短名}.html`
-  - 章次對應課程章節：01 Introduction、02 OS Structure、03 Processes、04 Threads、05 CPU Scheduling。
+  - 章次對應課程章節：01 Introduction、02 OS Structure、03 Processes、04 Threads、05 CPU Scheduling（之後依序延伸，新章次接在 06 之後）。
+
   - 範例：`os-04-threads.html`
 - 全小寫、用 `-`，不可有空白或中文。
 - 原始教材放 `sources/`，AI 只能讀取，不可修改或刪除。
