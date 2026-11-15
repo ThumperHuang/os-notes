@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ch1 作業系統導論 | OS 小講義</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+  <article class="lesson"
+    data-id="os-01-introduction"
+    data-prereq=""
+    data-leads-to="os-02-os-structure,os-03-processes">
+
+    <h1>Ch1 作業系統導論</h1>
+    <p class="meta">來源：00_OS_Syllabus_v1.0.pdf、01_OS_Introduction_v1.0.pdf、期中摘要</p>
+
+    <h2>學習目標</h2>
+    <ul>
+      <li>說明作業系統（Operating System, OS）的角色與目標</li>
+      <li>比較 Batch、Multiprogramming、Time-sharing 三種系統</li>
+      <li>會用公式計算 CPU 利用率</li>
+    </ul>
+
+    <h2>直覺說明</h2>
+    <p>把電腦想成一間餐廳。硬體是廚房設備，應用程式是客人的點餐需求，作業系統就是店長：負責分配資源、維持秩序，讓客人不用自己進廚房開瓦斯。</p>
+    <p>早期電腦沒有 OS，程式設計者必須自己處理檔案、記憶體、除錯與保護。這很耗時，也容易出錯，所以才需要 OS。</p>
+
+    <h2>核心概念</h2>
+    <h3>OS 的三個角色</h3>
+    <table>
+      <tr><th>角色</th><th>說明</th></tr>
+      <tr><td>資源抽象（Resource Abstraction）</td><td>隱藏硬體的複雜度</td></tr>
+      <tr><td>資源管理者（Resource Manager）</td><td>管理 CPU、記憶體、I/O</td></tr>
+      <tr><td>控制者（Controller）</td><td>控制程式執行，避免錯誤與不當使用</td></tr>
+    </table>
+    <p>溝通介面：<strong>使用者 ↔ OS 是 Shell</strong>；<strong>應用程式 ↔ OS 是 System Call</strong>。</p>
+
+    <h3>主機系統演進</h3>
+    <table>
+      <tr><th>系統</th><th>特色</th><th>缺點／需求</th></tr>
+      <tr><td>Batch 批次</td><td>用控制卡（$JOB、$RUN）依序執行工作</td><td>無互動、CPU 常閒置</td></tr>
+      <tr><td>Multiprogramming 多道程式</td><td>多個 Job 放在記憶體，等 I/O 時切給其他 Job</td><td>需要記憶體管理與 CPU 排程</td></tr>
+      <tr><td>Time-sharing 分時</td><td>頻繁切換（Time Quantum），可互動、多使用者</td><td>需要虛擬記憶體與檔案系統</td></tr>
+    </table>
+
+    <h3>CPU 利用率</h3>
+    <div class="formula">U = C / (C + I)</div>
+    <p>C 是 CPU 計算時間，I 是 I/O 等待時間。</p>
+
+    <h3>系統架構</h3>
+    <ul>
+      <li><strong>SMP</strong>：每個處理器執行相同 OS、共享資源。</li>
+      <li><strong>UMA</strong>：存取任何記憶體位置的時間相同。<strong>NUMA</strong>：本地記憶體快，遠端記憶體慢。</li>
+      <li><strong>Hard real-time</strong>：錯過期限即失敗（如核電廠）。<strong>Soft real-time</strong>：逾時可接受（如影音串流）。</li>
+    </ul>
+
+    <h2>程式或範例</h2>
+    <p>printf() 最後會透過 write() 這個 System Call 輸出。下面兩段輸出的效果相同：</p>
+    <pre><code class="lang-c">#include &lt;stdio.h&gt;
+#include &lt;unistd.h&gt;
+
+int main(void) {
+    printf("Hello via printf\n");         /* C 函式庫包裝 */
+    fflush(stdout);                       /* 先送出緩衝區，確保順序正確 */
+    write(1, "Hello via write\n", 16);    /* 直接呼叫 System Call */
+    return 0;
+}</code></pre>
+    <p><strong>預期輸出：</strong></p>
+    <pre><code>Hello via printf
+Hello via write</code></pre>
+
+    <p><strong>計算範例：</strong>C = 2 ms，I = 998 ms。</p>
+    <pre><code>U = 2 / (2 + 998) = 2 / 1000 = 0.2%</code></pre>
+    <p>多道程式設計的目的，就是讓不同 Job 的 I/O 與計算重疊，提高這個數字。</p>
+
+    <h2>考試重點</h2>
+    <div class="callout">
+      <ul>
+        <li>Shell 與 System Call 分別連接哪兩端。</li>
+        <li>Batch、Multiprogramming、Time-sharing 的差異與需求。</li>
+        <li>UMA 與 NUMA 的比較。</li>
+        <li>Hard 與 Soft real-time 的例子。</li>
+        <li>U = C / (C + I) 的計算。</li>
+      </ul>
+    </div>
+
+    <h2>常見錯誤</h2>
+    <ul>
+      <li>把 Multiprogramming 和 Time-sharing 混為一談。前者重點是 I/O 重疊，後者重點是互動性（靠 Time Quantum 切換）。</li>
+      <li>計算 U 時把分母寫成只有 I，漏掉 C。</li>
+    </ul>
+
+    <h2>練習題</h2>
+    <details><summary>題目 1：C = 5 ms、I = 95 ms，CPU 利用率是多少？</summary>
+      <p>U = 5 / (5 + 95) = 5%。</p></details>
+    <details><summary>題目 2：為什麼 Batch 系統的 CPU 常閒置？</summary>
+      <p>I/O 速度遠慢於 CPU（至少約 1:1000），且一次只執行一個 Job，等待 I/O 時 CPU 無事可做。</p></details>
+    <details><summary>題目 3：Time-sharing 為何需要虛擬記憶體？</summary>
+      <p>多個使用者的程式要同時駐留，實體記憶體不夠，所以需要虛擬記憶體來擴充。</p></details>
+
+    <h2>相關單元</h2>
+    <ul class="rel">
+      <li>延伸：Ch2 作業系統結構（System Call 與 API 的細節，即將推出）</li>
+      <li>延伸：<a href="os-03-processes.html" data-rel="extends">Ch3 行程</a>（多道程式中的「Job」在此正式稱為 Process）</li>
+    </ul>
+
+    <nav>
+      <span></span>
+      <a href="../index.html">回首頁</a>
+      <span class="meta">下一篇：Ch2 即將推出</span>
+    </nav>
+  </article>
+</body>
+</html>
